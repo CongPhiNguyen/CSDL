@@ -101,10 +101,16 @@ from
 group by  year(ddh.NGAYDH)
 
 -----5.Tìm mã đặt hàng đã đặt tất cả mặt hàng do nhà cung cấp Vissan cung cấp
-------select distinct ncc.MACC, ncc.TENCC
-------from CUNGCAP cc join NHACC ncc on (cc.MACC=ncc.MACC)
-------where exists (select * from CUNGCAP where MACC= cc.MACC and MAMH in(select MAMH from MATHANG where NUOCSX='Việt Nam')) 
-------and not exists (select * from CUNGCAP where MACC= cc.MACC and MAMH in(select MAMH from MATHANG where NUOCSX='Trung Quốc') )
+
+select ddh.MADH 
+from DONDH ddh
+where not exists (select * from (select MAMH from CUNGCAP where MACC in (select MACC from NHACC where TENCC='Vissan')) as bangtra
+				where not exists
+				(
+					select * from CHITIET ct where ddh.MADH=ct.MADH and 
+					ct.MAMH=bangtra.MAMH
+				)  
+			)
 
 -----6.Tìm những mặt hàng (tên và mã) có số lượng đặt hàng nhiều nhất trong năm 2018
 select thongke.MAMH, mh.TENMH
