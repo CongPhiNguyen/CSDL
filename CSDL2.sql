@@ -114,10 +114,15 @@ where MAVDV in(select
 					and MAVDV in (select MAVDV from THAMGIA where MANDT in (select MANDT from NOIDUNGTHI where TENNDT='200m bơi tự do')))
 
 ----5. In ra MAVDV , họ tên của VDV nữ người anh tham gia tất cả kỳ TVH từ 2008 đến nay
-select * from THAMGIA tg join VANDONGVIEN vdv on (tg.MAVDV=vdv.MAVDV) 
-where QUOCTICH='UK' and GIOITINH='Nu'
-select MATVH from THEVANHOI where NAM>=2008
-
+select vdv.MAVDV,VDV.HOTEN 
+from VANDONGVIEN vdv
+where vdv.GIOITINH='Nu' and VDV.QUOCTICH in (select MAQG from QUOCGIA where TENQG='Anh') 
+		and not exists (select * from (select MATVH from THEVANHOI where NAM>=2008) as bangtra
+				where not exists
+					(
+						select * from THAMGIA tg where vdv.MAVDV=tg.MAVDV and bangtra.MATVH=tg.MATVH
+					)
+				)
 ----6. Tìm VDV (Mã VDV, Họ tên) đã đạt từ 2 HCV trở lên ở Olympic Rio 2016
 select 
 	MAVDV, HOTEN
@@ -159,7 +164,15 @@ where MAVDV in(select
 				where MANDT in(select MANDT from NOIDUNGTHI where TENNDT='100m bơi ngửa')
 					and MAVDV not in (select MAVDV from THAMGIA where MANDT in (select MANDT from NOIDUNGTHI where TENNDT='200m bơi tự do')))
 ---10. In ra thông tin MAVDV, Ho Ten của VDV nam người đức tham gia full thế vận hội từ năm 2012 đến nay
-
+select vdv.MAVDV,VDV.HOTEN 
+from VANDONGVIEN vdv
+where vdv.GIOITINH='Nam' and VDV.QUOCTICH in (select MAQG from QUOCGIA where TENQG='Đức') 
+		and not exists (select * from (select MATVH from THEVANHOI where NAM>=2012) as bangtra
+				where not exists
+					(
+						select * from THAMGIA tg where vdv.MAVDV=tg.MAVDV and bangtra.MATVH=tg.MATVH
+					)
+				)
 ---11. Tim VDV(MaVDV, Họ tên) đã đạt từ 2 HCV trở lên ở nội dung thi bắn cung
 select 
 	MAVDV, HOTEN
