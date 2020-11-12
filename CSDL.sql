@@ -7,12 +7,9 @@ create table MATHANG
 	MAMH varchar(10) not null,
 	TENMH varchar(40),
 	DVT varchar(40),
-	NUOCSX varchar(10)
+	NUOCSX varchar(10),
+	constraint PK_MATHANG primary key (MAMH)
 )
---Tao khoa chinh
-alter table MATHANG
-	add constraint PK_MATHANG primary key (MAMH)
-
 create table NHACC
 (
 	MACC varchar(10) not null,
@@ -27,37 +24,30 @@ create table CUNGCAP
 (
 	MACC varchar(10) not null,
 	MAMH varchar(40) not null,
-	TUNGAY smalldatetime
+	TUNGAY smalldatetime,
+	constraint FK_MACC foreign key(MACC) references NHACC(MACC),
+	constraint PK_CUNGCAP primary key(MACC,MAMH)
 )
---Tao khoa chinh
-alter table CUNGCAP
-	add constraint PK_CUNGCAP primary key(MACC,MAMH)
-
 create table DONDH
 (
 	MADH varchar(10) not null,
 	NGAYDH smalldatetime,
 	MACC varchar(10),
 	TONGTRIGIA money,
-	SOMH int
+	SOMH int,
+	constraint PK_DONDH primary key(MADH)
 )
---Tao khoa chinh
-alter table DONDH
-	add constraint PK_DONDH primary key(MADH)
-
-
-
 create table CHITIET
 (
 	MADH varchar(10) not null,
 	MAMH varchar(10) not null,
 	SOLUONG int,
 	DONGIA money,
-	TRIGIA money
+	TRIGIA money,
+	constraint FK_MADH foreign key(MADH) references DONDH(MADH),
+	constraint FK_MAMH foreign key(MAMH) references MATHANG(MAMH),
+	constraint PK_CHITIET primary key(MADH,MAMH)
 )
---Tao khoa ngoai
-alter table CHITIET
-	add constraint PK_CHITIET primary key(MADH,MAMH)
 
 
 --Ở đây sẽ cập nhật các khóa ngoại

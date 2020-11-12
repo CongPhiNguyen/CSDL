@@ -1,4 +1,5 @@
 ﻿create database QLVH
+go
 use QLVH
 set dateformat DMY
 -----QUOCGIA(MAQG,TENQG,CHAULUC,DIENTICH)
@@ -22,6 +23,9 @@ create table THEVANHOI
 alter table THEVANHOI
 add constraint PK_THEVANHOI primary key(MATVH)
 
+alter table THEVANHOI
+	add constraint FK_MAQG
+		foreign key(MAGQ) references QUOCGIA(MAQG)
 create table VANDONGVIEN
 (
 	MAVDV varchar(10) not null,
@@ -32,6 +36,10 @@ create table VANDONGVIEN
 )
 alter table VANDONGVIEN
 add constraint PK_VANDONGVIEN primary key(MAVDV)
+
+alter table VANDONGVIEN
+	add constraint FK_QUOCTICH
+		foreign key(MAGQ) references QUOCGIA(MAQG)
 
 create table NOIDUNGTHI
 (
@@ -51,6 +59,19 @@ create table THAMGIA
 )
 alter table THAMGIA
 add constraint PK_THAMGIA primary key(MAVDV,MANDT,MATVH)
+alter table THAMGIA
+	add constraint FK_MAVDV
+		foreign key(MAVDV) references VANDONGVIEN(MAVDV)
+alter table THAMGIA
+	add constraint MANDT
+		foreign key(MANDT) references NOIDUNGTHI(MANDT)
+alter table THAMGIA
+	add constraint MATVH
+		foreign key(MATVH) references THEVANHOI(MATVH)
+
+
+
+
 
 --Nhập dữ liệu
 insert into QUOCGIA
@@ -84,6 +105,14 @@ values
 	(1, 'Điền kinh',NULL),
 	(2, 'Bắn súng',NULL),
 	(3, 'Nhảy cầu',NULL)
+
+
+
+
+
+
+
+
 
 ----1. Tìm danh sách vận động viên(họ tên, ngày sinh, giới tính) có quốc tịch UK và săp xếp theo họ tên tăng dần
 select HOTEN, NGSINH, GIOITINH
