@@ -86,178 +86,96 @@ values
 	(3, 'Nhảy cầu',NULL)
 
 ----1. Tìm danh sách vận động viên(họ tên, ngày sinh, giới tính) có quốc tịch UK và săp xếp theo họ tên tăng dần
-----2. In ra danh dách VDV tham gia nội dung thi bắn cung ử TVH Olympic Tokyo 2020
-----3. Cho biết số lượng HCV mà VDV Nhật bản đạt được ử TVH diễn ra vào năm 2020
-----4. Kiệt kê họ tên, quốc tịch VDV tham gia cả 2 nội dung thi 100m bơi ngửa và 200m bơi tự do
+select HOTEN, NGSINH, GIOITINH
+from VANDONGVIEN 
+where QUOCTICH='UK' 
+order by HOTEN
+----2. In ra danh dách VDV tham gia nội dung thi bắn cung ở TVH Olympic Tokyo 2020
+select MAVDV, HOTEN
+from VANDONGVIEN where MAVDV in (select MAVDV from THAMGIA where MATVH in (select MATVH from THEVANHOI where TENTVH='Olympic Tokyo 2020')
+									and MANDT in(select MANDT from NOIDUNGTHI where TENNDT='Bắn cung')
+								)
+
+----3. Cho biết số lượng HCV mà VDV Nhật bản đạt được ở TVH diễn ra vào năm 2020
+select
+	count(tg.HUYCHUONG) as TONG_HUY_CHUONG
+from
+	THAMGIA tg join VANDONGVIEN vdv on(tg.MAVDV=vdv.MAVDV) 
+where 
+	MATVH in (select MATVH from THEVANHOI where NAM=2020) and QUOCTICH in (select MAQG from QUOCGIA where TENQG='Nhật bản')
+
+----4. Liệt kê họ tên, quốc tịch VDV tham gia cả 2 nội dung thi 100m bơi ngửa và 200m bơi tự do
+select HOTEN, QUOCTICH
+from VANDONGVIEN
+where MAVDV in(select 
+					MAVDV
+				from THAMGIA
+				where MANDT in(select MANDT from NOIDUNGTHI where TENNDT='100m bơi ngửa')
+					and MAVDV in (select MAVDV from THAMGIA where MANDT in (select MANDT from NOIDUNGTHI where TENNDT='200m bơi tự do')))
+
 ----5. In ra MAVDV , họ tên của VDV nữ người anh tham gia tất cả kỳ TVH từ 2008 đến nay
+select * from THAMGIA tg join VANDONGVIEN vdv on (tg.MAVDV=vdv.MAVDV) 
+where QUOCTICH='UK' and GIOITINH='Nu'
+select MATVH from THEVANHOI where NAM>=2008
+
 ----6. Tìm VDV (Mã VDV, Họ tên) đã đạt từ 2 HCV trở lên ở Olympic Rio 2016
+select 
+	MAVDV, HOTEN
+from
+	VANDONGVIEN
+where 
+	MAVDV in(
+		select 
+			MAVDV
+		from 
+			THAMGIA
+		where 
+			MATVH in (select MATVH from THEVANHOI where TENTVH='Olympic Rio 2016') and HUYCHUONG='HCV'
+		group by MAVDV
+		having count(HUYCHUONG)>2
+		)
 ----7. In ra VDV tham gia điền kinh Olympic Rio 2016
-----8 
+select 
+	MAVDV, HOTEN
+from
+	VANDONGVIEN
+where 
+	MAVDV in (select MAVDV from THAMGIA where MATVH in (select MATVH from THEVANHOI where TENTVH='Olympic Rio 2016'))
+----8. Cho biết số huy chương bạc mà VDV Trung Quốc đạt đc ở TVH diễn ra vào 2012
+select
+	count(HUYCHUONG) as DEM_HUY_CHUONG_BAC
+from 
+	THAMGIA tg join THEVANHOI tvh on(tg.MATVH=tvh.MATVH)
+	join VANDONGVIEN vdv on tg.MAVDV=vdv.MAVDV
+where 
+	vdv.QUOCTICH in (select MAQG from QUOCGIA where TENQG='Trung Quốc')
+	and tg.HUYCHUONG='HCB'
+----9. Liệt kê họ tên, quốc tịch của những vận động viên tham gia 100 m bơi ngửa nhưng không tham gia 200m bơi tự do
+select HOTEN, QUOCTICH
+from VANDONGVIEN
+where MAVDV in(select 
+					MAVDV
+				from THAMGIA
+				where MANDT in(select MANDT from NOIDUNGTHI where TENNDT='100m bơi ngửa')
+					and MAVDV not in (select MAVDV from THAMGIA where MANDT in (select MANDT from NOIDUNGTHI where TENNDT='200m bơi tự do')))
+---10. In ra thông tin MAVDV, Ho Ten của VDV nam người đức tham gia full thế vận hội từ năm 2012 đến nay
 
-
-
-
--- CAU 1
-SELECT HOTEN,NGSINH,GIOITINH
-FROM VANDONGVIEN
-WHERE QUOCTICH = 'UK'
-ORDER BY HOTEN ASC
-
--- CAU 2
-SELECT MAVDV
-FROM VANDONGVIEN
-WHERE MAVDV IN
-(
-SELECT A.MAVDV
-FROM
-THAMGIA A INNER JOIN THEVANHOI B
-ON
-	A.MATVH = B.MATVH
-WHERE 
-	 (B.NAM = '2020')
-)
-
--- CAU 3
-SELECT COUNT(HUYCHUONG) AS SOHUYCHUONG
-FROM VANDONGVIEN M INNER JOIN
-(
-SELECT A.MAVDV, A.HUYCHUONG
-FROM
-THAMGIA A INNER JOIN THEVANHOI B
-ON
-	A.MATVH = B.MATVH
-WHERE 
-	(B.NAM = '2020')
-) N
-ON M.MAVDV = N.MAVDV
-WHERE M.QUOCTICH = 'NHAT BAN'
-
--- CAU 4
-SELECT HOTEN, QUOCTICH
-FROM VANDONGVIEN
-WHERE MAVDV IN
-(
-SELECT A.MAVDV 
-FROM THAMGIA A INNER JOIN NOIDUNGTHI B
-ON A.MANDT = B.MANDT
-WHERE (TENNDT = '100M')
-)
-INTERSECT
-SELECT HOTEN, QUOCTICH
-FROM VANDONGVIEN
-WHERE MAVDV IN
-(
-SELECT A.MAVDV 
-FROM THAMGIA A INNER JOIN NOIDUNGTHI B
-ON A.MANDT = B.MANDT
-WHERE (TENNDT = '200M')
-)
-
--- CAU 5
-SELECT MAVDV,HOTEN
-FROM VANDONGVIEN
-WHERE 
-(QUOCTICH = 'ANH') AND
-(MAVDV IN 
-	(
-	SELECT A.MAVDV
-	FROM THAMGIA A INNER JOIN THEVANHOI B
-	ON A.MATVH = B.MATVH
-	WHERE NAM = '2008' AND NAM ='2009'AND
-	NAM = '2010' AND NAM = '2011'AND NAM ='2012'AND NAM ='2013' AND NAM ='2017' AND NAM ='2018' AND NAM ='2019'
-	)
-)
-
--- CAU 6 (còn bug)
-SELECT MAVDV,HOTEN 
-FROM VANDONGVIEN
-WHERE MAVDV IN (
-	SELECT A.MAVDV
-	FROM THAMGIA A INNER JOIN THEVANHOI B
-	ON A.MATVH = B.MATVH
-	WHERE (B.NAM = '2016')
-	GROUP BY A.MAVDV 
-	HAVING (COUNT(A.HUYCHUONG) > 1)
-)
-
---cau 7
-SELECT N.MAVDV
-FROM NOIDUNGTHI M INNER JOIN
-(
-SELECT A.MAVDV, A.MANDT
-FROM
-THAMGIA A INNER JOIN THEVANHOI B
-ON
-	A.MATVH = B.MATVH
-WHERE 
-	 (B.NAM = '2016')
-) N
-ON M.MANDT = N.MANDT
-WHERE M.TENNDT = 'DIEN KINH'
-
---CAU 8
-
-SELECT COUNT(N.HUYCHUONG) AS SOHC 
-FROM VANDONGVIEN M INNER JOIN
-(
-	SELECT A.MAVDV, A.HUYCHUONG
-	FROM THAMGIA A INNER JOIN THEVANHOI B
-	ON A.MATVH = B.MATVH
-	WHERE (B.NAM = '2012')
-) N
-ON M.MAVDV = N.MAVDV
-WHERE (M.QUOCTICH = 'TRUNG QUOC') AND (N.HUYCHUONG = 'BAC')
-
--- CAU 9
-SELECT HOTEN, QUOCTICH
-FROM VANDONGVIEN
-WHERE MAVDV IN
-(
-SELECT A.MAVDV 
-FROM THAMGIA A INNER JOIN NOIDUNGTHI B
-ON A.MANDT = B.MANDT
-WHERE (TENNDT = '100M')
-)
-EXCEPT
-SELECT HOTEN, QUOCTICH
-FROM VANDONGVIEN
-WHERE MAVDV IN
-(
-SELECT A.MAVDV 
-FROM THAMGIA A INNER JOIN NOIDUNGTHI B
-ON A.MANDT = B.MANDT
-WHERE (TENNDT = '500M')
-)
-
--- CAU 10
-SELECT MAVDV,HOTEN
-FROM VANDONGVIEN
-WHERE 
-(QUOCTICH = 'DUC') AND (GIOITINH = 'NAM') AND
-(MAVDV IN 
-	(
-	SELECT A.MAVDV
-	FROM THAMGIA A INNER JOIN THEVANHOI B
-	ON A.MATVH = B.MATVH
-	WHERE NAM = '2008' AND NAM ='2009'AND
-	NAM = '2010' AND NAM = '2011'AND NAM ='2012'AND NAM ='2013' AND NAM ='2017' AND NAM ='2018' AND NAM ='2019'
-	)
-)
-
---CAU 11
-
-SELECT M.MAVDV
-FROM VANDONGVIEN M INNER JOIN (
-	SELECT A.MAVDV,A.HUYCHUONG
-	FROM THAMGIA A INNER JOIN NOIDUNGTHI B
-	ON A.MANDT = B.MANDT
-	WHERE (B.TENNDT = 'BAN CUNG')
-) N
-ON M.MAVDV = N.MAVDV
-WHERE (N.HUYCHUONG = 'VANG')
-GROUP BY M.MAVDV
-having COUNT(N.HUYCHUONG)>1
-
+---11. Tim VDV(MaVDV, Họ tên) đã đạt từ 2 HCV trở lên ở nội dung thi bắn cung
+select 
+	MAVDV, HOTEN
+from
+	VANDONGVIEN
+where 
+	MAVDV in(
+		select 
+			MAVDV
+		from 
+			THAMGIA
+		where 
+			MANDT in(select MANDT from NOIDUNGTHI where TENNDT='Bắn cung') and HUYCHUONG='HCV'
+		group by MAVDV
+		having count(HUYCHUONG)>2
+		)
 
 
 
