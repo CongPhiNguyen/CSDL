@@ -49,9 +49,6 @@ create table CHITIET
 	constraint PK_CHITIET primary key(MADH,MAMH)
 )
 
-
---Ở đây sẽ cập nhật các khóa ngoại
-
 --Các câu lệnh
 
 -----1. Liệt kê danh sách các đơn hàng gồm mã đơn hàng, ngày đơn hàng, tổng trị giá của nhà cung cấp 'Vinamilk' với tổng trị giá lớn hơn 1 triệu

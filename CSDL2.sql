@@ -1,77 +1,52 @@
-﻿create database QLVH
+﻿use master
+drop database QLVH
+create database QLVH
 go
 use QLVH
 set dateformat DMY
------QUOCGIA(MAQG,TENQG,CHAULUC,DIENTICH)
 create table QUOCGIA
 (
 	MAQG varchar(10) not null,
 	TENQG varchar(50),
 	CHAULUC varchar(50),
-	DIENTICH int
+	DIENTICH int,
+	constraint PK_QUOCGIA primary key(MAQG)
 )
-alter table QUOCGIA
-add constraint PK_QUOCGIA primary key(MAQG)
-
 create table THEVANHOI
 (
 	MATVH varchar(10) not null,
 	TENTVH varchar(50),
 	MAQG varchar(10),
-	NAM int
+	NAM int,
+	constraint PK_THEVANHOI primary key(MATVH),
 )
-alter table THEVANHOI
-add constraint PK_THEVANHOI primary key(MATVH)
-
-alter table THEVANHOI
-	add constraint FK_MAQG
-		foreign key(MAGQ) references QUOCGIA(MAQG)
 create table VANDONGVIEN
 (
 	MAVDV varchar(10) not null,
 	HOTEN varchar(50),
 	NGSINH datetime,
 	GIOITINH varchar(50),
-	QUOCTICH varchar(10)
+	QUOCTICH varchar(10),
+	constraint PK_VANDONGVIEN primary key(MAVDV),
 )
-alter table VANDONGVIEN
-add constraint PK_VANDONGVIEN primary key(MAVDV)
-
-alter table VANDONGVIEN
-	add constraint FK_QUOCTICH
-		foreign key(MAGQ) references QUOCGIA(MAQG)
-
 create table NOIDUNGTHI
 (
 	MANDT varchar(10) not null,
 	TENNDT varchar(50),
-	GHICHU varchar(50)
+	GHICHU varchar(50),
+	constraint PK_NOIDUNGTHI primary key(MANDT)
 )
-alter table NOIDUNGTHI
-add constraint PK_NOIDUNGTHI primary key(MANDT)
-
 create table THAMGIA
 (
 	MAVDV varchar(10) not null,
 	MANDT varchar(10) not null,
 	MATVH varchar(10) not null,
-	HUYCHUONG varchar(50)
+	HUYCHUONG varchar(50),
+	constraint FK_MAVDV foreign key(MAVDV) references VANDONGVIEN(MAVDV),
+	constraint MANDT foreign key(MANDT) references NOIDUNGTHI(MANDT),
+	constraint MATVH foreign key(MATVH) references THEVANHOI(MATVH),
+	constraint PK_THAMGIA primary key(MAVDV,MANDT,MATVH)
 )
-alter table THAMGIA
-add constraint PK_THAMGIA primary key(MAVDV,MANDT,MATVH)
-alter table THAMGIA
-	add constraint FK_MAVDV
-		foreign key(MAVDV) references VANDONGVIEN(MAVDV)
-alter table THAMGIA
-	add constraint MANDT
-		foreign key(MANDT) references NOIDUNGTHI(MANDT)
-alter table THAMGIA
-	add constraint MATVH
-		foreign key(MATVH) references THEVANHOI(MATVH)
-
-
-
-
 
 --Nhập dữ liệu
 insert into QUOCGIA
