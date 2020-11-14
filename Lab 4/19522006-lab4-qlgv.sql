@@ -153,11 +153,41 @@ from
 	KETQUATHI kqt join HOCVIEN hv on kqt.MAHV=hv.MAHV
 where
 	LANTHI=1 and kqt.KQUA='Dat' and kqt.MAHV not in (select distinct MAHV from KETQUATHI where LANTHI=1 and KQUA='Khong Dat')
+
 --Câu 32. * Tìm học viên (mã học viên, họ tên) thi môn nào cũng đạt (chỉ xét lần thi sau cùng).
+select distinct
+	kqt.MAHV , hv.HO +' '+ hv.TEN as HOTEN
+from 
+	KETQUATHI kqt join HOCVIEN hv on kqt.MAHV=hv.MAHV
+where LANTHI=1 and kqt.KQUA='Dat' and kqt.MAHV not in(select distinct MAHV from KETQUATHI where LANTHI=1 and KQUA='Khong Dat')
+	or (LANTHI=2 and kqt.KQUA='Dat' and kqt.MAHV not in (select distinct MAHV from KETQUATHI where LANTHI=2 and KQUA='Khong Dat'))
+	or (LANTHI=3 and kqt.KQUA='Dat' and kqt.MAHV not in (select distinct MAHV from KETQUATHI where LANTHI=3 and KQUA='Khong Dat'))
 
 --Câu 33. * Tìm học viên (mã học viên, họ tên) đã thi tất cả các môn đều đạt (chỉ xét lần thi thứ 1).
+select	
+	hv.MAHV, hv.HO+' '+hv.TEN as HOTEN
+from HOCVIEN hv 
+where not exists
+	(
+		select * from (select MAMH from MONHOC) as bangtra
+		where not exists 
+		(
+			select * from KETQUATHI kqt where hv.MAHV=kqt.MAHV and bangtra.MAMH=kqt.MAMH and kqt.LANTHI=1 and kqt.KQUA='Dat'
+		)
+	)
 
 --Câu 34. * Tìm học viên (mã học viên, họ tên) đã thi tất cả các môn đều đạt (chỉ xét lần thi sau cùng).
+select	
+	hv.MAHV, hv.HO+' '+hv.TEN as HOTEN
+from HOCVIEN hv 
+where not exists
+	(
+		select * from (select MAMH from MONHOC) as bangtra
+		where not exists 
+		(
+			select * from KETQUATHI kqt where hv.MAHV=kqt.MAHV and bangtra.MAMH=kqt.MAMH and kqt.KQUA='Dat'
+		)
+	)
 
 --Câu 35. ** Tìm học viên (mã học viên, họ tên) có điểm thi cao nhất trong từng môn (lấy điểm ở lần thi sau cùng).
 
