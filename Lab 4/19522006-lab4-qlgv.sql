@@ -88,6 +88,31 @@ from
 	HOCVIEN hocvien join
 	(select	MALOP, TRGLOP from LOP where SISO in (select top 1 SISO from LOP order by SISO desc)) loptruong on loptruong.TRGLOP=hocvien.MAHV
 
+--Câu 25:  Tìm họ tên những LOPTRG thi không đạt quá 3 môn (mỗi môn đều thi không đạt ở tất cả các lần thi).select 
+	TRGLOP, hv.HO+' '+hv.TEN as HOTEN
+from 
+	LOP lop join HOCVIEN hv on(lop.TRGLOP=hv.MAHV) 
+where
+	TRGLOP in
+	(
+		select
+			MAHV
+		from
+		(
+			select 
+				lanthi1.MAHV, lanthi1.MAMH, coalesce(lanthi3.KQUA, lanthi2.KQUA,lanthi1.KQUA,'Khong Dat') as KETQUACUOICUNG, coalesce(lanthi3.LANTHI, lanthi2.LANTHI,lanthi1.LANTHI) as LANTHI
+			from 
+				 (select * from KETQUATHI where LANTHI=1) as lanthi1 left join
+				 (select * from KETQUATHI where LANTHI=2) as lanthi2 on(lanthi1.MAHV=lanthi2.MAHV and lanthi1.MAMH=lanthi2.MAMH and lanthi1.KQUA='Khong Dat') left join
+				 (select * from KETQUATHI where LANTHI=3) as lanthi3 on (lanthi2.MAHV=lanthi3.MAHV and lanthi3.MAMH=lanthi2.MAMH
+												and lanthi2.KQUA='Khong Dat' and lanthi1.KQUA='Khong Dat' 
+												and lanthi3.MAMH=lanthi1.MAMH and lanthi3.MAHV=lanthi1.MAHV)
+		) as ketquathicuoicung
+		where KETQUACUOICUNG='Khong dat'
+		group by MAHV
+		having count(MAMH)>=3
+	) --Đây là bảng đếm các sinh viên rớt 3 môn trở lên
+
 
 --Câu 26. Tìm học viên (mã học viên, họ tên) có số môn đạt điểm 9,10 nhiều nhất.
 select MAHV, HO + ' ' + TEN as HOTEN
