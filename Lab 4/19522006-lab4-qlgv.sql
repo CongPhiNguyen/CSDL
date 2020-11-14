@@ -30,6 +30,9 @@ order by cackhoa.MAKHOA
 
 --Câu 22:  Mỗi môn học thống kê số lượng học viên theo kết quả (đạt và không đạt)
 
+
+
+
 --Câu 23. Tìm giáo viên (mã giáo viên, họ tên) là giáo viên chủ nhiệm của một lớp, đồng thời dạy cho lớp đó ít nhất một môn học.
 select giaovien.MAGV,giaovien.HOTEN
 from GIAOVIEN giaovien join
@@ -145,7 +148,6 @@ where so_nguoi_rot_theo_mon.DEM_ROT in(
 										where LANTHI=1 and KQUA='Khong Dat') as bangsonguoithirot
 										group by MAMH
 										)
-select * from KETQUATHI
 --Câu 31. Tìm học viên (mã học viên, họ tên) thi môn nào cũng đạt (chỉ xét lần thi thứ 1).
 select distinct
 	kqt.MAHV , hv.HO +' '+ hv.TEN as HOTEN
@@ -163,7 +165,7 @@ where LANTHI=1 and kqt.KQUA='Dat' and kqt.MAHV not in(select distinct MAHV from 
 	or (LANTHI=2 and kqt.KQUA='Dat' and kqt.MAHV not in (select distinct MAHV from KETQUATHI where LANTHI=2 and KQUA='Khong Dat'))
 	or (LANTHI=3 and kqt.KQUA='Dat' and kqt.MAHV not in (select distinct MAHV from KETQUATHI where LANTHI=3 and KQUA='Khong Dat'))
 
---Câu 33. * Tìm học viên (mã học viên, họ tên) đã thi tất cả các môn đều đạt (chỉ xét lần thi thứ 1).
+--Câu 33. Tìm học viên (mã học viên, họ tên) đã thi tất cả các môn đều đạt (chỉ xét lần thi thứ 1).
 select	
 	hv.MAHV, hv.HO+' '+hv.TEN as HOTEN
 from HOCVIEN hv 
@@ -176,7 +178,7 @@ where not exists
 		)
 	)
 
---Câu 34. * Tìm học viên (mã học viên, họ tên) đã thi tất cả các môn đều đạt (chỉ xét lần thi sau cùng).
+--Câu 34. Tìm học viên (mã học viên, họ tên) đã thi tất cả các môn đều đạt (chỉ xét lần thi sau cùng).
 select	
 	hv.MAHV, hv.HO+' '+hv.TEN as HOTEN
 from HOCVIEN hv 
@@ -189,7 +191,15 @@ where not exists
 		)
 	)
 
---Câu 35. ** Tìm học viên (mã học viên, họ tên) có điểm thi cao nhất trong từng môn (lấy điểm ở lần thi sau cùng).
+--Câu 35. Tìm học viên (mã học viên, họ tên) có điểm thi cao nhất trong từng môn (lấy điểm ở lần thi sau cùng).
+select kqt.MAHV,kqt.MAMH, kqt.DIEM
+from KETQUATHI kqt join
+	(
+	select MAMH,MAX(DIEM) as DIEMCAO
+	from KETQUATHI
+	group by MAMH
+	) as diemcaonhat on kqt.MAMH=diemcaonhat.MAMH and  kqt.DIEM=diemcaonhat.DIEMCAO
+order by kqt.MAMH
 
 
 
