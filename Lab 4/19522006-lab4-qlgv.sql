@@ -27,10 +27,46 @@ from
 (select coalesce(count(MAGV),0) as SLTS, MAKHOA from GIAOVIEN where HOCVI='TS' group by MAKHOA) demTs on (demTs.MAKHOA=cackhoa.MAKHOA) full join
 (select coalesce(count(MAGV),0) as SLPTS, MAKHOA from GIAOVIEN where HOCVI='PTS' group by MAKHOA) dempts on(dempts.MAKHOA=cackhoa.MAKHOA)
 order by cackhoa.MAKHOA
-
 --Câu 22:  Mỗi môn học thống kê số lượng học viên theo kết quả (đạt và không đạt)
-
-
+select mh.MAMH, coalesce (bangdemsinhviendat.DEMSOLUONGDAT,0) as DAT, coalesce(bangdemsinhvienrot.DEMSOLUONGROT,0) as KHONGDAT
+from
+	MONHOC mh left join
+(
+	select
+		MAMH,
+		count(ketquathicuoicung.MAHV) as DEMSOLUONGDAT
+	from
+	(
+		select 
+			lanthi1.MAHV, lanthi1.MAMH, coalesce(lanthi3.KQUA, lanthi2.KQUA,lanthi1.KQUA,'Khong Dat') as KETQUACUOICUNG, coalesce(lanthi3.LANTHI, lanthi2.LANTHI,lanthi1.LANTHI) as LANTHI
+		from 
+			 (select * from KETQUATHI where LANTHI=1) as lanthi1 left join
+			 (select * from KETQUATHI where LANTHI=2) as lanthi2 on(lanthi1.MAHV=lanthi2.MAHV and lanthi1.MAMH=lanthi2.MAMH and lanthi1.KQUA='Khong Dat') left join
+			 (select * from KETQUATHI where LANTHI=3) as lanthi3 on (lanthi2.MAHV=lanthi3.MAHV and lanthi3.MAMH=lanthi2.MAMH
+											and lanthi2.KQUA='Khong Dat' and lanthi1.KQUA='Khong Dat' 
+											and lanthi3.MAMH=lanthi1.MAMH and lanthi3.MAHV=lanthi1.MAHV)
+	) as ketquathicuoicung
+	where KETQUACUOICUNG='Dat'
+	group by MAMH
+) as bangdemsinhviendat on mh.MAMH=bangdemsinhviendat.MAMH  left join
+(
+	select
+		MAMH,
+		count(ketquathicuoicung.MAHV) as DEMSOLUONGROT
+	from
+	(
+		select 
+			lanthi1.MAHV, lanthi1.MAMH, coalesce(lanthi3.KQUA, lanthi2.KQUA,lanthi1.KQUA,'Khong Dat') as KETQUACUOICUNG, coalesce(lanthi3.LANTHI, lanthi2.LANTHI,lanthi1.LANTHI) as LANTHI
+		from 
+			 (select * from KETQUATHI where LANTHI=1) as lanthi1 left join
+			 (select * from KETQUATHI where LANTHI=2) as lanthi2 on(lanthi1.MAHV=lanthi2.MAHV and lanthi1.MAMH=lanthi2.MAMH and lanthi1.KQUA='Khong Dat') left join
+			 (select * from KETQUATHI where LANTHI=3) as lanthi3 on (lanthi2.MAHV=lanthi3.MAHV and lanthi3.MAMH=lanthi2.MAMH
+											and lanthi2.KQUA='Khong Dat' and lanthi1.KQUA='Khong Dat' 
+											and lanthi3.MAMH=lanthi1.MAMH and lanthi3.MAHV=lanthi1.MAHV)
+	) as ketquathicuoicung
+	where KETQUACUOICUNG='Khong dat'
+	group by MAMH
+) as bangdemsinhvienrot on bangdemsinhviendat.MAMH=bangdemsinhvienrot.MAMH
 
 
 --Câu 23. Tìm giáo viên (mã giáo viên, họ tên) là giáo viên chủ nhiệm của một lớp, đồng thời dạy cho lớp đó ít nhất một môn học.
