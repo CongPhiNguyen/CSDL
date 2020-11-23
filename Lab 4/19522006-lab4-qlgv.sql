@@ -88,7 +88,8 @@ from
 	HOCVIEN hocvien join
 	(select	MALOP, TRGLOP from LOP where SISO in (select top 1 SISO from LOP order by SISO desc)) loptruong on loptruong.TRGLOP=hocvien.MAHV
 
---Câu 25:  Tìm họ tên những LOPTRG thi không đạt quá 3 môn (mỗi môn đều thi không đạt ở tất cả các lần thi).select 
+--Câu 25:  Tìm họ tên những LOPTRG thi không đạt quá 3 môn (mỗi môn đều thi không đạt ở tất cả các lần thi).
+select 
 	TRGLOP, hv.HO+' '+hv.TEN as HOTEN
 from 
 	LOP lop join HOCVIEN hv on(lop.TRGLOP=hv.MAHV) 
@@ -216,7 +217,7 @@ from
 	KETQUATHI kqt join HOCVIEN hv on kqt.MAHV=hv.MAHV
 where
 	LANTHI=1 and kqt.KQUA='Dat' and kqt.MAHV not in (select distinct MAHV from KETQUATHI where LANTHI=1 and KQUA='Khong Dat')
-
+select * from KETQUATHI
 --Câu 32. * Tìm học viên (mã học viên, họ tên) thi môn nào cũng đạt (chỉ xét lần thi sau cùng).
 select distinct
 	kqt.MAHV , hv.HO +' '+ hv.TEN as HOTEN
