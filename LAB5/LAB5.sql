@@ -1,7 +1,6 @@
 ﻿----TRIGGER----
 --QLBH
 --11. Ngày mua hàng (NGHD) của một khách hàng thành viên sẽ lớn hơn hoặc bằng ngày khách hàng đó đăng ký thành viên (NGDK).
-
 create trigger trigg_insert_hoadon on HOADON
 for insert
 as
@@ -117,7 +116,74 @@ where SOHD=99999
 ---------------CURSOR
 
 --14. Trị giá của một hóa đơn là tổng thành tiền (số lượng*đơn giá) của các chi tiết thuộc hóa đơn đó.
+go
+create trigger trigg_insert on CTHD
+for insert, update
+as
+begin
+	declare @SoHD int, @MaSP char(4), @SoLuong int, @TriGia money
 
+	select @SoHD=SOHD, @MaSP=MASP, @SoLuong=SL
+	from inserted
 
+	set @TriGia=@SoLuong * (select GIA from SANPHAM where MASP=@MaSP)--set = 0 ở đây cũng đc
+
+	declare cur_cthd cursor
+	for
+		select MASP, SL from CTHD where SOHD=@SoHD
+	open cur_cthd
+	fetch next from cur_cthd
+	into @MaSP, @SoLuong
+	set @TriGia=0
+	while(@@FETCH_STATUS = 0)
+	begin
+		set @TriGia=@TriGia + @soLuong * (select GIA from SANPHAM where MASP=@MaSP)
+		fetch next from cur_cthd
+		into @MaSP, @SoLuong
+	end
+
+	close cur_cthd
+	deallocate cur_cthd
+	update HOADON set TRIGIA=@TriGia where SOHD=@SoHD
+end
+select * from HOADON
+select * from SANPHAM
+insert into CTHD
+	(SOHD, MASP, SL)
+values
+	(1001,'ST10',2)
 
 --15. Doanh số của một khách hàng là tổng trị giá các hóa đơn mà khách hàng thành viên đó đã mua.
+
+
+go
+create trigger trigg_insert_doanhso on KHACHHANG
+for insert, update
+as
+begin
+	declare @tongtrigia money,
+	set @tongtrigia=0
+
+	select from inserted
+
+	declare cur_hoadon
+	for
+		set 
+	open cur_hoadon
+
+	fetch next from cur_hoadon
+	into 
+
+	while(@@FETCH_STATUS = 0)
+	begin
+		set @tongtrigia = @tongtrigia + 
+		fetch next from cur_hoadon
+		into 
+
+	end
+
+	close cur_hoadon
+	deallocate cur_hoadon
+	update 
+end
+
