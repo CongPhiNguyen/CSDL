@@ -271,10 +271,7 @@ delete HOADON where SOHD=1001
 --CÂU 2:------------------------------------------------------------------------------------------
 
 
-select * from LOP
--- Testcase dùng để test
-update LOP set TRGLOP='K1205' where MALOP='K11'
-update LOP set TRGLOP='K1108' where MALOP='K11'
+
 
 
 
